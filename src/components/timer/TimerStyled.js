@@ -30,4 +30,8 @@ export const TimerStyled = styled.div`
   .reset {
     border-radius: 0 50pc 50pc 0;
   }
+  button:hover,
+  button:focus {
+    background-color: rgba(220, 20, 60, 0.8);
+  }
 `;

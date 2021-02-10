@@ -1,4 +1,4 @@
-import React, { useState, useReducer, useEffect, useRef } from "react";
+import React, { useEffect, useReducer, useRef } from "react";
 import { TimerStyled } from "./TimerStyled";
 
 const initialState = {
@@ -19,7 +19,7 @@ const reducer = (state, { type, payload }) => {
       return { ...state, start: false, wait: true };
 
     case "reset":
-      return initialState;
+      return { ...initialState, start: true };
 
     default:
       return state;
@@ -27,17 +27,25 @@ const reducer = (state, { type, payload }) => {
 };
 
 function Timer() {
+  const delayValue = useRef(0);
+  const timerRef = useRef(null);
   const [state, dispatch] = useReducer(reducer, initialState);
   const waitBtn = useRef(null);
 
-  useEffect(() => {
-    if (state.wait) {
-      setTimeout(() => {
-        waitBtn.current.disabled = false;
-        dispatch({ type: "start" });
-      }, 300);
-    }
-  }, [state.wait]);
+  const setWait = () => {
+    delayValue.current += 1;
+    timerRef.current = setTimeout(() => {
+      if (delayValue.current === 2) {
+        dispatch({ type: "wait" });
+        delayValue.current = 0;
+        timerRef.current = 0;
+        clearInterval(timerRef.current);
+        state.start && (waitBtn.current.disabled = true);
+      } else {
+        delayValue.current = 0;
+      }
+    }, 300);
+  };
 
   return (
     <TimerStyled>
@@ -59,10 +67,10 @@ function Timer() {
           className="wait"
           name="wait"
           type="button"
-          disabled={state.start ? state.wait : false}
+          disabled={state.start ? false : true}
           ref={waitBtn}
           onClick={() => {
-            state.start && dispatch({ type: "wait" });
+            state.start && setWait();
           }}
         >
           wait
